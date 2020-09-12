@@ -6,6 +6,13 @@ const queries = require('../sql/queries')
 // CREATING NEW USER
 
 // GETTING ALL USERS
+router.get('/', (req, res) => {
+    sql.query(queries.getAllUsers, {
+        type: sql.QueryTypes.SELECT
+    }).then(r => {
+        res.status(200).json(r)
+    }).catch(e => res.status(500).send(e))
+})
 
 // GETTING A USER BY ID
 
