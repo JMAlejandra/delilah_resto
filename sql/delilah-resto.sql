@@ -7,7 +7,7 @@ CREATE TABLE `users` (
   `full_name` varchar(255) NOT NULL,
   `username` varchar(255) UNIQUE NOT NULL,
   `email` varchar(255) UNIQUE NOT NULL,
-  `phone` varchar(15) UNIQUE NOT NULL,
+  `phone` varchar(30) UNIQUE NOT NULL,
   `address` varchar(255) NOT NULL,
   `user_password` varchar(255) NOT NULL,
   `created_at` timestamp,

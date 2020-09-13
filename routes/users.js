@@ -3,7 +3,45 @@ const router = express.Router()
 const sql = require('../mysql')
 const queries = require('../sql/queries')
 
+// MIDDLEWARES
+const checkEmailField = require("../middlewares/checkEmailField")
+const checkNewUserFields = require("../middlewares/checkNewUserFields")
+const hashUserPassword = require("../middlewares/hashUserPassword")
+
 // CREATING NEW USER
+router.post('/', checkNewUserFields, checkEmailField, hashUserPassword, async (req, res) => {
+    const hashedPassword = res.locals.hashedPassword
+    const { full_name, username, email, phone, address } = req.body
+    try {
+        const data = await sql.query(queries.createNewUser, {
+            replacements: {
+                // :full_name, :username, :email, :phone, :address, :user_password, :is_admin
+                full_name, username, email, phone, address,
+                user_password: hashedPassword,
+                is_admin: 0
+            }
+        })
+        res.status(201).send({
+            user_id: data[0],
+            message: "New User Added"
+        })
+    } catch (err) {
+        if (err.original.errno === 1062) {
+            res.status(501).json({
+                message: `Error inserting into database`,
+                error: err.errors[0].message
+            })
+        } else {
+            res.status(500).json({
+                message: `Error creating user.`
+            })
+        }
+
+    }
+
+})
+
+// LOGGING A USER BY ID
 
 // GETTING ALL USERS
 router.get('/', (req, res) => {
@@ -27,8 +65,6 @@ router.get('/:id', (req, res) => {
 // UPDATING A USER BY ID
 
 // DELETING A USER BY ID
-
-// LOGGING A USER BY ID
 
 
 module.exports = router
