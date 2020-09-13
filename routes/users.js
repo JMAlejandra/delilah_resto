@@ -15,6 +15,14 @@ router.get('/', (req, res) => {
 })
 
 // GETTING A USER BY ID
+router.get('/:id', (req, res) => {
+    sql.query(queries.getUserById + '?', {
+        type: sql.QueryTypes.SELECT,
+        replacements: [parseInt(req.params.id)]
+    }).then(r => {
+        res.status(200).json(r)
+    }).catch(e => res.status(500).send(`Database Error: ${e.message}`))
+})
 
 // UPDATING A USER BY ID
 
