@@ -3,7 +3,16 @@ const router = express.Router()
 const sql = require('../mysql')
 const queries = require('../sql/queries')
 
+// MIDDLEWARES
+const checkEmailField = require('../middlewares/checkEmailField')
+const checkNewUserFields = require("../middlewares/checkNewUserFields")
+
 // CREATING NEW USER
+router.post('/', checkNewUserFields, checkEmailField, (req, res) => {
+    res.send("test")
+})
+
+// LOGGING A USER BY ID
 
 // GETTING ALL USERS
 router.get('/', (req, res) => {
@@ -27,8 +36,6 @@ router.get('/:id', (req, res) => {
 // UPDATING A USER BY ID
 
 // DELETING A USER BY ID
-
-// LOGGING A USER BY ID
 
 
 module.exports = router
