@@ -13,6 +13,11 @@ const authorizeUser = async (req, res, next) => {
         if (!data.length) {
             res.status(404).send("User not found")
         } else {
+            res.locals.user = {
+                id: data[0].id,
+                is_admin: data[0].is_admin,
+                username: data[0].username
+            }
             const isPasswordCorrect = await bcrypt.compare(user_password, data[0].user_password)
             isPasswordCorrect ? next() : res.status(401).send("The username or password is incorrect")
         }
