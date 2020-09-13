@@ -4,19 +4,20 @@ const bcrypt = require('bcrypt')
 
 const authorizeUser = async (req, res, next) => {
     const { username, user_password } = req.body
+    console.log(req.body)
     try {
         const data = await sql.query(queries.getUserCredentials, {
             type: sql.QueryTypes.SELECT,
             replacements: { username }
         })
-        const isPasswordCorrect = await bcrypt.compare(user_password, data[0].user_password)
-        if (isPasswordCorrect) {
-            return next()
+        if (!data.length) {
+            res.status(404).send("User not found")
         } else {
-            res.status(401).send("The username or password is incorrect")
+            const isPasswordCorrect = await bcrypt.compare(user_password, data[0].user_password)
+            isPasswordCorrect ? next() : res.status(401).send("The username or password is incorrect")
         }
     } catch (err) {
-        res.status(500).send()
+        res.status(500).json(err)
     }
 }
 
