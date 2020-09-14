@@ -7,6 +7,7 @@ const createNewUser = `INSERT INTO users
 const userIsAdminById = `select is_admin from users where id = :id`
 const getUserCredentialsByUsername = `select id, is_admin, username, user_password from users where username = :username`
 const getUserCredentialsByEmail = `select id, is_admin, username, user_password, email from users where email = :email`
+const updateUserRole = `UPDATE users SET is_admin = :is_admin WHERE id = :id ;`
 
 module.exports = {
     getAllUsers,
@@ -15,4 +16,5 @@ module.exports = {
     userIsAdminById,
     getUserCredentialsByUsername,
     getUserCredentialsByEmail,
+    updateUserRole,
 }
