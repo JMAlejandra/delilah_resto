@@ -75,6 +75,24 @@ router.get('/:id', (req, res) => {
 // UPDATING A USER BY ID
 
 // UPDATING A USER BY ID - GIVES ADMIN PERMISSIONS
+router.put('/', verifyUserToken, isUserAdmin, async (req, res) => {
+    const { is_admin, id } = req.query
+    const role = is_admin == "true" ? 1 : 0
+    try {
+        const data = await sql.query(queries.updateUserRole, {
+            replacements: {
+                id: parseInt(id),
+                is_admin: role
+            }
+        })
+        console.log(data[0].affectedRows)
+        if (data[0].affectedRows === 1) {
+            res.status(200).json({ message: "User permissions updated." })
+        }
+    } catch (err) {
+        res.status(500).json({ message: "Error updating user permissions" })
+    }
+})
 
 // DELETING A USER BY ID
 
