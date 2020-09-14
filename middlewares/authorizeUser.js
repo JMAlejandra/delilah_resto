@@ -1,15 +1,23 @@
 const sql = require('../mysql')
 const queries = require('../sql/queries')
 const bcrypt = require('bcrypt')
+const checkEmailFormat = require("../utils/checkEmailFormat")
 
 const authorizeUser = async (req, res, next) => {
-    const { username, user_password } = req.body
-    console.log(req.body)
+    const { user_credential, user_password } = req.body
     try {
-        const data = await sql.query(queries.getUserCredentials, {
-            type: sql.QueryTypes.SELECT,
-            replacements: { username }
-        })
+        let data = [];
+        if (!checkEmailFormat(user_credential)) {
+            data = await sql.query(queries.getUserCredentialsByUsername, {
+                type: sql.QueryTypes.SELECT,
+                replacements: { username: user_credential }
+            })
+        } else {
+            data = await sql.query(queries.getUserCredentialsByEmail, {
+                type: sql.QueryTypes.SELECT,
+                replacements: { email: user_credential }
+            })
+        }
         if (!data.length) {
             res.status(404).send("User not found")
         } else {
@@ -22,6 +30,7 @@ const authorizeUser = async (req, res, next) => {
             isPasswordCorrect ? next() : res.status(401).send("The username or password is incorrect")
         }
     } catch (err) {
+        console.log(err)
         res.status(500).json(err)
     }
 }
