@@ -10,5 +10,10 @@ server.listen(3000, () => {
 server.use(express.json())
 
 // ROUTES
+// Users
 const usersRouter = require('./routes/users')
 server.use('/users', usersRouter)
+
+// products
+const productsRouter = require('./routes/products')
+server.use('/products', productsRouter)
