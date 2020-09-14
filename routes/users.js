@@ -2,11 +2,14 @@ const express = require("express")
 const router = express.Router()
 const sql = require('../mysql')
 const queries = require('../sql/queries')
+const jwt = require('jsonwebtoken')
 
 // MIDDLEWARES
 const checkEmailField = require("../middlewares/checkEmailField")
 const checkNewUserFields = require("../middlewares/checkNewUserFields")
 const hashUserPassword = require("../middlewares/hashUserPassword")
+const isUserAdmin = require("../middlewares/isUserAdmin")
+const authorizeUser = require("../middlewares/authorizeUser")
 
 // CREATING NEW USER
 router.post('/', checkNewUserFields, checkEmailField, hashUserPassword, async (req, res) => {
@@ -36,12 +39,17 @@ router.post('/', checkNewUserFields, checkEmailField, hashUserPassword, async (r
                 message: `Error creating user.`
             })
         }
-
     }
-
 })
 
 // LOGGING A USER BY ID
+router.post('/login', authorizeUser, async (req, res) => {
+    const signature = "thisIsVerySafe"
+    const token = jwt.sign(res.locals.user, signature)
+    res.authorization
+    res.append('Authorization', `Bearer ${token}`)
+    res.status(200).send("User logged in succesfully")
+})
 
 // GETTING ALL USERS
 router.get('/', (req, res) => {
@@ -64,7 +72,8 @@ router.get('/:id', (req, res) => {
 
 // UPDATING A USER BY ID
 
-// DELETING A USER BY ID
+// UPDATING A USER BY ID - GIVES ADMIN PERMISSIONS
 
+// DELETING A USER BY ID
 
 module.exports = router
