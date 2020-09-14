@@ -57,8 +57,12 @@ router.post('/login', authorizeUser, async (req, res) => {
 router.get('/', verifyUserToken, isUserAdmin, (req, res) => {
     sql.query(queries.getAllUsers, {
         type: sql.QueryTypes.SELECT
-    }).then(r => {
-        res.status(200).json(r)
+    }).then(data => {
+        if (data.length === 0) {
+            res.status(404).json({ error: "Users not found" })
+        } else {
+            res.status(200).json(data)
+        }
     }).catch(e => res.status(500).send(e))
 })
 
@@ -72,7 +76,11 @@ router.get('/:id', verifyUserToken, async (req, res) => {
                 type: sql.QueryTypes.SELECT,
                 replacements: [id]
             })
-            res.status(200).json(data)
+            if (data.length === 0) {
+                res.status(404).json({ error: "User not found" })
+            } else {
+                res.status(200).json(data)
+            }
         } else {
             res.status(403).json({ error: "User is not authorized to access the resource" })
         }
