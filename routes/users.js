@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require("express")
 const router = express.Router()
 const sql = require('../mysql')
@@ -10,6 +12,7 @@ const checkNewUserFields = require("../middlewares/checkNewUserFields")
 const hashUserPassword = require("../middlewares/hashUserPassword")
 const isUserAdmin = require("../middlewares/isUserAdmin")
 const authorizeUser = require("../middlewares/authorizeUser")
+const verifyUserToken = require('../middlewares/verifyUserToken')
 
 // CREATING NEW USER
 router.post('/', checkNewUserFields, checkEmailField, hashUserPassword, async (req, res) => {
@@ -44,15 +47,14 @@ router.post('/', checkNewUserFields, checkEmailField, hashUserPassword, async (r
 
 // LOGGING A USER BY ID
 router.post('/login', authorizeUser, async (req, res) => {
-    const signature = "thisIsVerySafe"
+    const signature = process.env.ACCESS_TOKEN_SECRET
     const token = jwt.sign(res.locals.user, signature)
-    res.authorization
     res.append('Authorization', `Bearer ${token}`)
     res.status(200).send("User logged in succesfully")
 })
 
 // GETTING ALL USERS
-router.get('/', (req, res) => {
+router.get('/', verifyUserToken, isUserAdmin, (req, res) => {
     sql.query(queries.getAllUsers, {
         type: sql.QueryTypes.SELECT
     }).then(r => {
