@@ -63,13 +63,22 @@ router.get('/', verifyUserToken, isUserAdmin, (req, res) => {
 })
 
 // GETTING A USER BY ID
-router.get('/:id', (req, res) => {
-    sql.query(queries.getUserById + '?', {
-        type: sql.QueryTypes.SELECT,
-        replacements: [parseInt(req.params.id)]
-    }).then(r => {
-        res.status(200).json(r)
-    }).catch(e => res.status(500).send(`Database Error: ${e.message}`))
+router.get('/:id', verifyUserToken, async (req, res) => {
+    console.log(res.locals.user)
+    try {
+        const id = res.locals.user.id
+        if (parseInt(req.params.id) === id) {
+            const data = await sql.query(queries.getUserById + '?', {
+                type: sql.QueryTypes.SELECT,
+                replacements: [id]
+            })
+            res.status(200).json(data)
+        } else {
+            res.status(403).json({ error: "User is not authorized to access the resource" })
+        }
+    } catch (err) {
+        res.status(500).send(`Database Error: ${err.message}`)
+    }
 })
 
 // UPDATING A USER BY ID
