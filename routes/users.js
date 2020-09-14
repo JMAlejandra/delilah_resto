@@ -85,9 +85,10 @@ router.put('/', verifyUserToken, isUserAdmin, async (req, res) => {
                 is_admin: role
             }
         })
-        console.log(data[0].affectedRows)
         if (data[0].affectedRows === 1) {
             res.status(200).json({ message: "User permissions updated." })
+        } else {
+            res.status(200).send({ message: "User already had the new permissions. Permissions remain unchanged." })
         }
     } catch (err) {
         res.status(500).json({ message: "Error updating user permissions" })
