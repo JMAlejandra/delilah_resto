@@ -46,8 +46,9 @@ router.post('/', checkNewUserFields, checkEmailField, hashUserPassword, async (r
 router.post('/login', authorizeUser, async (req, res) => {
     const signature = "thisIsVerySafe"
     const token = jwt.sign(res.locals.user, signature)
-    res.append('Authorization', token)
-    res.send("done")
+    res.authorization
+    res.append('Authorization', `Bearer ${token}`)
+    res.status(200).send("User logged in succesfully")
 })
 
 // GETTING ALL USERS
