@@ -11,9 +11,11 @@ const getUserCredentialsByEmail = `select id, is_admin, username, user_password,
 const updateUserRole = `UPDATE users SET is_admin = :is_admin WHERE id = :id ;`
 
 // PRODUCT QUERIES
-const getAllProducts = `select * from products where is_enabled = 1`
+const getAllProducts = `select * from products`
+const getAllEnabledProducts = `select * from products where is_enabled = 1`
 const getProductById = `select * from products where id = :id`
 const getEnabledProductById = `select * from products where id = :id and is_enabled = 1`
+const deleteProductById = `DELETE FROM products WHERE id = :id`
 
 module.exports = {
     getAllUsers,
@@ -24,6 +26,8 @@ module.exports = {
     getUserCredentialsByEmail,
     updateUserRole,
     getAllProducts,
+    getAllEnabledProducts,
     getProductById,
-    getEnabledProductById
+    getEnabledProductById,
+    deleteProductById
 }
