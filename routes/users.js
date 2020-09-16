@@ -66,21 +66,21 @@ router.get('/', verifyUserToken, isUserAdmin, (req, res) => {
     }).catch(e => res.status(500).send(e))
 })
 
-// GETTING A USER BY ID
+// GETTING A USER BY ID 
 router.get('/:id', verifyUserToken, async (req, res) => {
     console.log(res.locals.user)
     try {
-        const id = res.locals.user.id
-        if (parseInt(req.params.id) === id) {
+        const user_id = res.locals.user.id
+        const id = req.params.id
+        if (res.locals.user.is_admin === 1 || parseInt(req.params.id) === user_id) {
             const data = await sql.query(queries.getUserById + '?', {
                 type: sql.QueryTypes.SELECT,
                 replacements: [id]
             })
             if (data.length === 0) {
-                res.status(404).json({ error: "User not found" })
-            } else {
-                res.status(200).json(data)
+                return res.status(404).json({ error: "User not found" })
             }
+            res.status(200).json(data)
         } else {
             res.status(403).json({ error: "User is not authorized to access the resource" })
         }
