@@ -50,7 +50,7 @@ router.get('/:id', verifyUserToken, async (req, res) => {
             })
         }
         if (data.length === 0) {
-            return res.status(404).json({ error: "Product not found" })
+            return res.status(404).json({ error: "Product ID not found" })
         }
         res.status(200).json(data)
     } catch (err) {
@@ -71,9 +71,9 @@ router.delete('/:id', verifyUserToken, isUserAdmin, async (req, res) => {
             })
         if (data[0].affectedRows === 0) {
             console.log(data)
-            return res.status(404).json({ error: "Product not found" })
+            return res.status(404).json({ error: "Product ID not found" })
         }
-        res.status(200).json({ message: "User deleted successfully" })
+        res.status(200).json({ message: "Product deleted successfully" })
     } catch (err) {
         res.status(500).send(`Database Error: ${err.message}`)
     }
