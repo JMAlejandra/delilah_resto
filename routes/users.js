@@ -57,24 +57,60 @@ router.post('/login', authorizeUser, async (req, res) => {
 router.get('/', verifyUserToken, isUserAdmin, (req, res) => {
     sql.query(queries.getAllUsers, {
         type: sql.QueryTypes.SELECT
-    }).then(r => {
-        res.status(200).json(r)
+    }).then(data => {
+        if (data.length === 0) {
+            res.status(404).json({ error: "Users not found" })
+        } else {
+            res.status(200).json(data)
+        }
     }).catch(e => res.status(500).send(e))
 })
 
-// GETTING A USER BY ID
-router.get('/:id', (req, res) => {
-    sql.query(queries.getUserById + '?', {
-        type: sql.QueryTypes.SELECT,
-        replacements: [parseInt(req.params.id)]
-    }).then(r => {
-        res.status(200).json(r)
-    }).catch(e => res.status(500).send(`Database Error: ${e.message}`))
+// GETTING A USER BY ID 
+router.get('/:id', verifyUserToken, async (req, res) => {
+    console.log(res.locals.user)
+    try {
+        const user_id = res.locals.user.id
+        const id = req.params.id
+        if (res.locals.user.is_admin === 1 || parseInt(req.params.id) === user_id) {
+            const data = await sql.query(queries.getUserById + '?', {
+                type: sql.QueryTypes.SELECT,
+                replacements: [id]
+            })
+            if (data.length === 0) {
+                return res.status(404).json({ error: "User not found" })
+            }
+            res.status(200).json(data)
+        } else {
+            res.status(403).json({ error: "User is not authorized to access the resource" })
+        }
+    } catch (err) {
+        res.status(500).send(`Database Error: ${err.message}`)
+    }
 })
 
 // UPDATING A USER BY ID
 
 // UPDATING A USER BY ID - GIVES ADMIN PERMISSIONS
+router.put('/', verifyUserToken, isUserAdmin, async (req, res) => {
+    const { is_admin, id } = req.query
+    const role = is_admin == "true" ? 1 : 0
+    try {
+        const data = await sql.query(queries.updateUserRole, {
+            replacements: {
+                id: parseInt(id),
+                is_admin: role
+            }
+        })
+        if (data[0].affectedRows === 1) {
+            res.status(200).json({ message: "User permissions updated." })
+        } else {
+            res.status(200).send({ message: "User already had the new permissions. Permissions remain unchanged." })
+        }
+    } catch (err) {
+        res.status(500).json({ message: "Error updating user permissions" })
+    }
+})
 
 // DELETING A USER BY ID
 

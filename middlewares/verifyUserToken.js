@@ -10,7 +10,7 @@ const verifyUserToken = async (req, res, next) => {
     }
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) return res.status(403).send({ message: "User does not have access to the resource" })
-        res.locals.adminUser = user
+        res.locals.user = user
         next()
     })
 }
