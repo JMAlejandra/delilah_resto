@@ -16,6 +16,20 @@ const getAllEnabledProducts = `select * from products where is_enabled = 1`
 const getProductById = `select * from products where id = :id`
 const getEnabledProductById = `select * from products where id = :id and is_enabled = 1`
 const deleteProductById = `DELETE FROM products WHERE id = :id`
+const createNewProduct = `INSERT INTO products 
+                            (description, price, image_url, is_favorite, is_enabled) 
+                          VALUES 
+                            (:description, :price, :image_url, :is_favorite, :is_enabled);`
+const updateProductById = `UPDATE products 
+                            SET 
+                                price = :price, 
+                                description = :description,
+                                image_url = :image_url,
+                                is_favorite = :is_favorite,
+                                is_enabled = :is_enabled
+                            WHERE id = :id `
+const updateIsFavoriteProductById = `UPDATE products SET is_favorite = :is_favorite WHERE id = :id`
+const updateIsEnabledProductById = `UPDATE products SET is_enabled = :is_enabled WHERE id = :id`
 
 module.exports = {
     getAllUsers,
@@ -29,5 +43,9 @@ module.exports = {
     getAllEnabledProducts,
     getProductById,
     getEnabledProductById,
-    deleteProductById
+    deleteProductById,
+    createNewProduct,
+    updateProductById,
+    updateIsEnabledProductById,
+    updateIsFavoriteProductById
 }
