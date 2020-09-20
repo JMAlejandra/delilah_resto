@@ -70,7 +70,7 @@ INSERT INTO `payment_options` (`id`, `description`, `is_enabled`) VALUES (NULL, 
 CREATE PROCEDURE GetOrdersBoard() 
 NOT DETERMINISTIC CONTAINS SQL SQL SECURITY INVOKER 
 SELECT 
-OrderStatus, created_at, id_order, id_payment_option, total, 
+OrderStatus, created_at, id_order, id_payment_option, payment_type, total, 
 full_name, address, GROUP_CONCAT(product_quantity, 'x ', description) as description 
 from ( 
     SELECT 
@@ -88,8 +88,8 @@ GROUP BY OrderStatus, created_at, id_order, id_payment_option, total, full_name,
 CREATE PROCEDURE GetOrderDetailsById(IN order_id int) 
 NOT DETERMINISTIC CONTAINS SQL SQL SECURITY INVOKER
 SELECT 
-    ord.id as order_id, p.description, pbo.product_quantity,
-    p.price, p.image_url, ord.total, os.description, po.description, 
+    ord.id as order_id, p.description as 'product_description', pbo.product_quantity,
+    p.price, p.image_url, ord.total, os.description as 'order_status', po.description as 'payment_option', 
     u.address, u.full_name, u.username, u.email, u.phone
     FROM 
     orders ORD 
@@ -99,3 +99,18 @@ SELECT
     INNER JOIN users U ON U.id = ORD.id_user 
     INNER JOIN products P on P.id = PBO.id_product
  where ord.id = order_id;
+
+CREATE PROCEDURE GetUserOrderDetailsById(IN order_id int, user_id int) 
+NOT DETERMINISTIC CONTAINS SQL SQL SECURITY INVOKER
+SELECT 
+    ord.id as order_id, p.description as 'product_description', pbo.product_quantity,
+    p.price, p.image_url, ord.total, os.description as 'order_status', po.description as 'payment_option', 
+    u.address, u.full_name, u.username, u.email, u.phone
+    FROM 
+    orders ORD 
+    INNER JOIN order_status OS ON ORD.id_status = OS.id 
+    INNER JOIN products_by_order PBO ON PBO.id_order = ORD.id 
+    INNER JOIN payment_options PO ON PO.id = ORD.id_payment_option 
+    INNER JOIN users U ON U.id = ORD.id_user 
+    INNER JOIN products P on P.id = PBO.id_product
+ where ord.id = order_id and u.id = user_id;
