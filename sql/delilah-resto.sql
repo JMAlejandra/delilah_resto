@@ -62,3 +62,40 @@ ALTER TABLE `orders` ADD FOREIGN KEY (`id_user`) REFERENCES `users` (`id`);
 ALTER TABLE `products_by_order` ADD FOREIGN KEY (`id_order`) REFERENCES `orders` (`id`);
 
 ALTER TABLE `products_by_order` ADD FOREIGN KEY (`id_product`) REFERENCES `products` (`id`);
+
+INSERT INTO `order_status` (`id`, `description`, `is_enabled`) VALUES (NULL, 'Confirmado', '1'), (NULL, 'En Preparación', '1'), (NULL, 'En Camino', '1'), (NULL, 'Entregado', '1');
+
+INSERT INTO `payment_options` (`id`, `description`, `is_enabled`) VALUES (NULL, 'Cash', '1'), (NULL, 'Debit Card', '2'), (NULL, 'Credit Card', '1'), (NULL, 'Gift Card', '1');
+
+CREATE PROCEDURE GetOrdersBoard() 
+NOT DETERMINISTIC CONTAINS SQL SQL SECURITY INVOKER 
+SELECT 
+OrderStatus, created_at, id_order, id_payment_option, total, 
+full_name, address, GROUP_CONCAT(product_quantity, 'x ', description) as description 
+from ( 
+    SELECT 
+    ORD.id AS id_order, OS.description AS 'OrderStatus', ord.created_at, PO.id as id_payment_option, 
+    PO.description as payment_type, ORD.total, U.full_name, U.address, P.description, PBO.product_quantity 
+    FROM 
+    orders ORD 
+    INNER JOIN order_status OS ON ORD.id_status = OS.id 
+    INNER JOIN products_by_order PBO ON PBO.id_order = ORD.id 
+    INNER JOIN payment_options PO ON PO.id = ORD.id_payment_option 
+    INNER JOIN users U ON U.id = ORD.id_user 
+    INNER JOIN products P on P.id = PBO.id_product ) as X 
+GROUP BY OrderStatus, created_at, id_order, id_payment_option, total, full_name, address;
+
+CREATE PROCEDURE GetOrderDetailsById(IN order_id int) 
+NOT DETERMINISTIC CONTAINS SQL SQL SECURITY INVOKER
+SELECT 
+    ord.id as order_id, p.description, pbo.product_quantity,
+    p.price, p.image_url, ord.total, os.description, po.description, 
+    u.address, u.full_name, u.username, u.email, u.phone
+    FROM 
+    orders ORD 
+    INNER JOIN order_status OS ON ORD.id_status = OS.id 
+    INNER JOIN products_by_order PBO ON PBO.id_order = ORD.id 
+    INNER JOIN payment_options PO ON PO.id = ORD.id_payment_option 
+    INNER JOIN users U ON U.id = ORD.id_user 
+    INNER JOIN products P on P.id = PBO.id_product
+ where ord.id = order_id;
