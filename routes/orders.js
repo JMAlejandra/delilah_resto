@@ -4,9 +4,12 @@ const sql = require('../mysql')
 const queries = require('../sql/queries')
 const isObjectEmpty = require("../utils/isObjectEmpty")
 
+
 // MIDDLEWARES
 const verifyUserToken = require("../middlewares/verifyUserToken")
 const isUserAdmin = require("../middlewares/isUserAdmin")
+const checkNewOrderFields = require("../middlewares/checkNewOrderFields")
+const asyncForEach = require("../utils/asyncForEach")
 
 // GET ALL ORDERS - BOARD
 router.get('/', verifyUserToken, isUserAdmin, async (req, res) => {
@@ -35,10 +38,57 @@ router.get('/:id', verifyUserToken, async (req, res) => {
             })
         }
         if (isObjectEmpty(data[0])) return res.status(404).json({ message: "Order was not found." })
+        console.log(data[0])
         res.status(200).json(data[0])
     } catch (err) {
         res.status(500).send(`Database Error: ${err.message}`)
     }
 })
+
+// CREATE A NEW ORDER
+router.post('/', verifyUserToken, checkNewOrderFields, async (req, res) => {
+    try {
+        const { id_payment_option, products } = req.body
+        // get user id 
+        const userId = res.locals.user.id
+        // gets order id
+        const orderTableInfo = await sql.query(`SHOW TABLE STATUS LIKE 'orders';`, { type: sql.QueryTypes.SELECT })
+        console.log('orderID = ' + orderTableInfo[0].Auto_increment)
+        // calculates order total
+        let total = 0
+        await asyncForEach(products, async (product) => {
+            const id = product.id_product
+            const data = await sql.query(queries.getProductPrice, { replacements: { id }, type: sql.QueryTypes.SELECT })
+            product.price = data[0].price
+            let subtotal = data[0].price * parseInt(product.quantity)
+            product.subtotal = parseFloat(subtotal).toString()
+            total += data[0].price * parseInt(product.quantity)
+        })
+        // creates order in orders table
+        const newOrder = await sql.query(queries.createNewOrder, {
+            replacements: { id_payment_option, id_user: userId, total: parseFloat(total) }
+        })
+        console.log(newOrder)
+        // gets order id for the created order
+        const orderId = newOrder[0]
+        // creates products_by_order row for each product
+        await asyncForEach(products, async (product) => {
+            const newProductRow = await sql.query(queries.addNewProductToOrder, {
+                replacements: {
+                    id_order: orderId,
+                    id_product: product.id_product,
+                    quantity: product.quantity,
+                    price: parseFloat(product.price)
+                }
+            })
+            //console.log(newProductRow)
+        })
+        res.json({ order_id: orderId, order_total: total, order_status: 1, products })
+    } catch (err) { res.status(400).json({ DatabaseError: err }) }
+})
+
+// UPDATE ORDER STATUS - ADMIN ONLY
+
+// DELETE ORDER ??
 
 module.exports = router
