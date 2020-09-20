@@ -68,9 +68,7 @@ router.post('/', verifyUserToken, checkNewOrderFields, async (req, res) => {
         const newOrder = await sql.query(queries.createNewOrder, {
             replacements: { id_payment_option, id_user: userId, total: parseFloat(total) }
         })
-        console.log(newOrder)
-        // gets order id for the created order
-        const orderId = newOrder[0]
+        const orderId = newOrder[0]     // gets order id for the created order
         // creates products_by_order row for each product
         await asyncForEach(products, async (product) => {
             const newProductRow = await sql.query(queries.addNewProductToOrder, {
@@ -81,13 +79,13 @@ router.post('/', verifyUserToken, checkNewOrderFields, async (req, res) => {
                     price: parseFloat(product.price)
                 }
             })
-            //console.log(newProductRow)
         })
         res.json({ order_id: orderId, order_total: total, order_status: 1, products })
     } catch (err) { res.status(400).json({ DatabaseError: err }) }
 })
 
 // UPDATE ORDER STATUS - ADMIN ONLY
+
 
 // DELETE ORDER ??
 
