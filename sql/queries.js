@@ -30,6 +30,9 @@ const updateProductById = `UPDATE products
                             WHERE id = :id `
 const updateIsFavoriteProductById = `UPDATE products SET is_favorite = :is_favorite WHERE id = :id`
 const updateIsEnabledProductById = `UPDATE products SET is_enabled = :is_enabled WHERE id = :id`
+const getOrdersBoard = `CALL GetOrdersBoard();`
+const getOrderDetailsById = `CALL GetOrderDetailsById(:order_id);`
+const getUserOrderDetailsById = `CALL GetUserOrderDetailsById(:order_id , :user_id);`
 
 module.exports = {
     getAllUsers,
@@ -47,5 +50,8 @@ module.exports = {
     createNewProduct,
     updateProductById,
     updateIsEnabledProductById,
-    updateIsFavoriteProductById
+    updateIsFavoriteProductById,
+    getOrdersBoard,
+    getOrderDetailsById,
+    getUserOrderDetailsById,
 }
