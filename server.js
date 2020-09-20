@@ -17,3 +17,7 @@ server.use('/users', usersRouter)
 // products
 const productsRouter = require('./routes/products')
 server.use('/products', productsRouter)
+
+// orders
+const ordersRouter = require('./routes/orders')
+server.use('/orders', ordersRouter)
