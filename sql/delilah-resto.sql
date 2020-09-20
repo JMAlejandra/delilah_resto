@@ -25,14 +25,14 @@ CREATE TABLE `orders` (
   `id_status` int,
   `id_payment_option` int,
   `id_user` int,
-  `total` decimal(5,2),
+  `total` decimal(10,2),
   `created_at` timestamp
 );
 
 CREATE TABLE `products` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `description` varchar(255) NOT NULL,
-  `price` decimal(5,2) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
   `image_url` varchar(255) DEFAULT "https://icon-library.com/images/no-picture-available-icon/no-picture-available-icon-1.jpg",
   `is_favorite` boolean NOT NULL,
   `is_enabled` boolean NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE `products_by_order` (
   `id_order` int NOT NULL,
   `id_product` int NOT NULL,
   `product_quantity` int NOT NULL,
-  `product_price` int NOT NULL
+  `product_price` decimal(10,2) NOT NULL
 );
 
 CREATE TABLE `order_status` (
@@ -89,7 +89,8 @@ CREATE PROCEDURE GetOrderDetailsById(IN order_id int)
 NOT DETERMINISTIC CONTAINS SQL SQL SECURITY INVOKER
 SELECT 
     ord.id as order_id, p.description as 'product_description', pbo.product_quantity,
-    p.price, p.image_url, ord.total, os.description as 'order_status', po.description as 'payment_option', 
+    pbo.product_price,  pbo.product_price * pbo.product_quantity as subtotal,
+    p.image_url, ord.total, os.description as 'order_status', po.description as 'payment_option', 
     u.address, u.full_name, u.username, u.email, u.phone
     FROM 
     orders ORD 
@@ -104,7 +105,8 @@ CREATE PROCEDURE GetUserOrderDetailsById(IN order_id int, user_id int)
 NOT DETERMINISTIC CONTAINS SQL SQL SECURITY INVOKER
 SELECT 
     ord.id as order_id, p.description as 'product_description', pbo.product_quantity,
-    p.price, p.image_url, ord.total, os.description as 'order_status', po.description as 'payment_option', 
+    pbo.product_price,  pbo.product_price * pbo.product_quantity as subtotal,
+    p.image_url, ord.total, os.description as 'order_status', po.description as 'payment_option', 
     u.address, u.full_name, u.username, u.email, u.phone
     FROM 
     orders ORD 
