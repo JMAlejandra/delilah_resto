@@ -85,8 +85,27 @@ router.post('/', verifyUserToken, checkNewOrderFields, async (req, res) => {
 })
 
 // UPDATE ORDER STATUS - ADMIN ONLY
+router.put('/:id/?', verifyUserToken, isUserAdmin, async (req, res) => {
+    try {
+        const id_status = parseInt(req.query.id_status)
+        const orderId = parseInt(req.params.id)
+        const data = await sql.query(queries.updateOrderStatus, { replacements: { id: orderId, id_status } })
+        if (data[0].affectedRows === 0) return res.status(202).json({ Message: "Order not updated, no rows were affected" })
+        res.status(200).json({ message: "Order updated successfully" })
+    } catch (err) {
+        res.status(500).send(`Database Error: ${err.message}`)
+    }
+})
 
-
-// DELETE ORDER ??
+// GET LIST OF ORDER STATUS
+router.get('/status/list/', verifyUserToken, async (req, res) => {
+    try {
+        const data = await sql.query(queries.getListOfOrderStatus, { type: sql.QueryTypes.SELECT })
+        if (data.length === 0) return res.status(204)
+        res.status(200).json(data)
+    } catch (err) {
+        res.status(500).send(`Database Error: ${err.message}`)
+    }
+})
 
 module.exports = router

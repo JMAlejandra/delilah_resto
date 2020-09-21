@@ -37,7 +37,9 @@ const getProductPrice = `SELECT id as id_product, price from products where id =
 const addNewProductToOrder = `INSERT INTO products_by_order (id, id_order, id_product, product_quantity, product_price) 
 VALUES (NULL, :id_order, :id_product, :quantity, :price)`
 const createNewOrder = `INSERT INTO orders (id, id_status, id_payment_option, id_user, total) 
-VALUES (null, 1, :id_payment_option, :id_user, :total)`
+VALUES (null, 1, :id_payment_option, :id_user, :total);`
+const updateOrderStatus = `UPDATE orders SET id_status = :id_status WHERE id = :id;`
+const getListOfOrderStatus = `SELECT id, description FROM order_status;`
 
 module.exports = {
   getAllUsers,
@@ -62,4 +64,6 @@ module.exports = {
   getProductPrice,
   addNewProductToOrder,
   createNewOrder,
+  updateOrderStatus,
+  getListOfOrderStatus,
 }
