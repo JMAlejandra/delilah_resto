@@ -1,6 +1,6 @@
-CREATE DATABASE delilah-resto;
+CREATE DATABASE delilahresto;
 
-USE delilah-resto;
+USE delilahresto;
 
 CREATE TABLE `users` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
