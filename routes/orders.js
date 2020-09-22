@@ -80,7 +80,7 @@ router.post('/', verifyUserToken, checkNewOrderFields, async (req, res) => {
                 }
             })
         })
-        res.json({ order_id: orderId, order_total: total, order_status: 1, products })
+        res.json({ user_id: res.locals.user.id, username: res.locals.user.username, order_id: orderId, order_total: total, order_status: 1, products })
     } catch (err) { res.status(400).json({ DatabaseError: err }) }
 })
 
