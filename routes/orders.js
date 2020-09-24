@@ -16,9 +16,9 @@ router.get('/', verifyUserToken, isUserAdmin, async (req, res) => {
     try {
         const data = await sql.query(queries.getOrdersBoard, { type: sql.QueryTypes.SELECT, })
         if (!data) return res.status(404).json({ message: "No orders were found." })
-        res.status(200).json(data[0])
+        res.status(200).json(data)
     } catch (err) {
-        res.status(500).send(`Database Error: ${err.message}`)
+        res.status(500).send(`Server Error: ${err.message}`)
     }
 })
 
@@ -37,11 +37,17 @@ router.get('/:id', verifyUserToken, async (req, res) => {
                 replacements: { order_id: parseInt(req.params.id), user_id: res.locals.user.id }
             })
         }
-        if (isObjectEmpty(data[0])) return res.status(404).json({ message: "Order was not found." })
-        console.log(data[0])
-        res.status(200).json(data[0])
+        if (isObjectEmpty(data[0])) {
+            res.status(404).json({ message: "Order was not found." })
+        } else {
+            const orderData = await sql.query(queries.getOrderInfoById, {
+                type: sql.QueryTypes.SELECT,
+                replacements: { order_id: parseInt(req.params.id) }
+            })
+            res.status(200).json({ order_information: orderData[0], products: data })
+        }
     } catch (err) {
-        res.status(500).send(`Database Error: ${err.message}`)
+        res.status(500).send(`Server Error: ${err.message}`)
     }
 })
 
@@ -93,18 +99,45 @@ router.put('/:id/?', verifyUserToken, isUserAdmin, async (req, res) => {
         if (data[0].affectedRows === 0) return res.status(202).json({ Message: "Order not updated, no rows were affected" })
         res.status(200).json({ message: "Order updated successfully" })
     } catch (err) {
-        res.status(500).send(`Database Error: ${err.message}`)
+        res.status(500).send(`Server Error: ${err.message}`)
     }
 })
 
 // GET LIST OF ORDER STATUS
 router.get('/status/list/', verifyUserToken, async (req, res) => {
     try {
+        //const data2 = await sql.query(`select * from payment_options; `, { type: sql.QueryTypes.SELECT })
         const data = await sql.query(queries.getListOfOrderStatus, { type: sql.QueryTypes.SELECT })
         if (data.length === 0) return res.status(204)
         res.status(200).json(data)
     } catch (err) {
-        res.status(500).send(`Database Error: ${err.message}`)
+        res.status(500).send(`Server Error: ${err.message}`)
+    }
+})
+
+// GET LIST OF PAYMENT METHODS
+router.get('/payments/list/', verifyUserToken, async (req, res) => {
+    try {
+        const data = await sql.query(`select * from payment_options; `, { type: sql.QueryTypes.SELECT })
+        if (data.length === 0) return res.status(204)
+        res.status(200).json(data)
+    } catch (err) {
+        res.status(500).send(`Server Error: ${err.message}`)
+    }
+})
+
+// DELETE ORDER BY ID
+router.delete('/:id', verifyUserToken, isUserAdmin, async (req, res) => {
+    try {
+        const orderId = parseInt(req.params.id)
+        const productsData = await sql.query(queries.deleteOrderProductsById, { replacements: { id: orderId } })
+        const orderData = await sql.query(queries.deleteOrderById, { replacements: { id: orderId } })
+        if (productsData[0].affectedRows === 0 || orderData[0].affectedRows === 0)
+            return res.status(404).json({ error: "Order ID not found" })
+        res.status(200).json({ message: "Order deleted successfully" })
+    } catch (err) {
+        console.log(err)
+        res.status(500).send(`Server Error: ${err.message}`)
     }
 })
 
