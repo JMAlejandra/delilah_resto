@@ -66,3 +66,8 @@ ALTER TABLE `products_by_order` ADD FOREIGN KEY (`id_product`) REFERENCES `produ
 INSERT INTO `order_status` (`id`, `description`, `is_enabled`) VALUES (NULL, 'Confirmado', '1'), (NULL, 'En Preparación', '1'), (NULL, 'En Camino', '1'), (NULL, 'Entregado', '1');
 
 INSERT INTO `payment_options` (`id`, `description`, `is_enabled`) VALUES (NULL, 'Cash', '1'), (NULL, 'Debit Card', '2'), (NULL, 'Credit Card', '1'), (NULL, 'Gift Card', '1');
+
+INSERT INTO `users` 
+(`id`, `full_name`, `username`, `email`, `phone`, `address`, `user_password`, `created_at`, `is_admin`) 
+VALUES 
+(NULL, 'admin user', 'admin', 'admin@delilahresto.com.ar', '54 011 5555 5555', 'Cabildo 500. Buenos Aires, Argentina', 'admin', current_timestamp(), '1'); 

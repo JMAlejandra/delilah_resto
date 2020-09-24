@@ -34,17 +34,21 @@ router.get('/:id', verifyUserToken, async (req, res) => {
         } else {
             data = await sql.query(queries.getUserOrderDetailsById, {
                 type: sql.QueryTypes.SELECT,
-                replacements: { order_id: parseInt(req.params.id), user_id: res.locals.user.id }
+                replacements: { order_id: parseInt(req.params.id), user_id: parseInt(res.locals.user.id) }
             })
         }
-        if (isObjectEmpty(data[0])) {
-            res.status(404).json({ message: "Order was not found." })
+        if (data.length > 0) {
+            if (isObjectEmpty(data[0])) {
+                res.status(404).json({ message: "Order was not found." })
+            } else {
+                const orderData = await sql.query(queries.getOrderInfoById, {
+                    type: sql.QueryTypes.SELECT,
+                    replacements: { order_id: parseInt(req.params.id) }
+                })
+                res.status(200).json({ order_information: orderData[0], products: data })
+            }
         } else {
-            const orderData = await sql.query(queries.getOrderInfoById, {
-                type: sql.QueryTypes.SELECT,
-                replacements: { order_id: parseInt(req.params.id) }
-            })
-            res.status(200).json({ order_information: orderData[0], products: data })
+            res.status(404).json({ message: "Order was not found." })
         }
     } catch (err) {
         res.status(500).send(`Server Error: ${err.message}`)
