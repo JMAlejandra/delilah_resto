@@ -1,0 +1,9 @@
+{
+	"database": {
+		"name": "delilahresto",
+		"user": "root",
+		"password": "",
+		"host": "localhost",
+		"port": ""
+	}
+}

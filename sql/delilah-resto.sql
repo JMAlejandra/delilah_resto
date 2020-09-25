@@ -1,6 +1,6 @@
-CREATE DATABASE delilah-resto;
+CREATE DATABASE delilahresto;
 
-USE delilah-resto;
+USE delilahresto;
 
 CREATE TABLE `users` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
@@ -25,14 +25,14 @@ CREATE TABLE `orders` (
   `id_status` int,
   `id_payment_option` int,
   `id_user` int,
-  `total` decimal(5,2),
+  `total` decimal(10,2),
   `created_at` timestamp
 );
 
 CREATE TABLE `products` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `description` varchar(255) NOT NULL,
-  `price` decimal(5,2) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
   `image_url` varchar(255) DEFAULT "https://icon-library.com/images/no-picture-available-icon/no-picture-available-icon-1.jpg",
   `is_favorite` boolean NOT NULL,
   `is_enabled` boolean NOT NULL,
@@ -44,12 +44,12 @@ CREATE TABLE `products_by_order` (
   `id_order` int NOT NULL,
   `id_product` int NOT NULL,
   `product_quantity` int NOT NULL,
-  `product_price` int NOT NULL
+  `product_price` decimal(10,2) NOT NULL
 );
 
 CREATE TABLE `order_status` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
-  `description` int NOT NULL,
+  `description` varchar(30) NOT NULL,
   `is_enabled` boolean NOT NULL
 );
 
@@ -67,50 +67,7 @@ INSERT INTO `order_status` (`id`, `description`, `is_enabled`) VALUES (NULL, 'Co
 
 INSERT INTO `payment_options` (`id`, `description`, `is_enabled`) VALUES (NULL, 'Cash', '1'), (NULL, 'Debit Card', '2'), (NULL, 'Credit Card', '1'), (NULL, 'Gift Card', '1');
 
-CREATE PROCEDURE GetOrdersBoard() 
-NOT DETERMINISTIC CONTAINS SQL SQL SECURITY INVOKER 
-SELECT 
-OrderStatus, created_at, id_order, id_payment_option, payment_type, total, 
-full_name, address, GROUP_CONCAT(product_quantity, 'x ', description) as description 
-from ( 
-    SELECT 
-    ORD.id AS id_order, OS.description AS 'OrderStatus', ord.created_at, PO.id as id_payment_option, 
-    PO.description as payment_type, ORD.total, U.full_name, U.address, P.description, PBO.product_quantity 
-    FROM 
-    orders ORD 
-    INNER JOIN order_status OS ON ORD.id_status = OS.id 
-    INNER JOIN products_by_order PBO ON PBO.id_order = ORD.id 
-    INNER JOIN payment_options PO ON PO.id = ORD.id_payment_option 
-    INNER JOIN users U ON U.id = ORD.id_user 
-    INNER JOIN products P on P.id = PBO.id_product ) as X 
-GROUP BY OrderStatus, created_at, id_order, id_payment_option, total, full_name, address;
-
-CREATE PROCEDURE GetOrderDetailsById(IN order_id int) 
-NOT DETERMINISTIC CONTAINS SQL SQL SECURITY INVOKER
-SELECT 
-    ord.id as order_id, p.description as 'product_description', pbo.product_quantity,
-    p.price, p.image_url, ord.total, os.description as 'order_status', po.description as 'payment_option', 
-    u.address, u.full_name, u.username, u.email, u.phone
-    FROM 
-    orders ORD 
-    INNER JOIN order_status OS ON ORD.id_status = OS.id 
-    INNER JOIN products_by_order PBO ON PBO.id_order = ORD.id 
-    INNER JOIN payment_options PO ON PO.id = ORD.id_payment_option 
-    INNER JOIN users U ON U.id = ORD.id_user 
-    INNER JOIN products P on P.id = PBO.id_product
- where ord.id = order_id;
-
-CREATE PROCEDURE GetUserOrderDetailsById(IN order_id int, user_id int) 
-NOT DETERMINISTIC CONTAINS SQL SQL SECURITY INVOKER
-SELECT 
-    ord.id as order_id, p.description as 'product_description', pbo.product_quantity,
-    p.price, p.image_url, ord.total, os.description as 'order_status', po.description as 'payment_option', 
-    u.address, u.full_name, u.username, u.email, u.phone
-    FROM 
-    orders ORD 
-    INNER JOIN order_status OS ON ORD.id_status = OS.id 
-    INNER JOIN products_by_order PBO ON PBO.id_order = ORD.id 
-    INNER JOIN payment_options PO ON PO.id = ORD.id_payment_option 
-    INNER JOIN users U ON U.id = ORD.id_user 
-    INNER JOIN products P on P.id = PBO.id_product
- where ord.id = order_id and u.id = user_id;
+INSERT INTO `users` 
+(`id`, `full_name`, `username`, `email`, `phone`, `address`, `user_password`, `created_at`, `is_admin`) 
+VALUES 
+(NULL, 'admin user', 'admin', 'admin@delilahresto.com.ar', '54 011 5555 5555', 'Cabildo 500. Buenos Aires, Argentina', '$2b$10$1PQiZfD5N3RpK3Sblt9.3e3zL7oL3M7L3qXhdqU6LmZbraep6B6SO', current_timestamp(), '1'); 
