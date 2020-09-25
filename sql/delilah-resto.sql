@@ -49,7 +49,7 @@ CREATE TABLE `products_by_order` (
 
 CREATE TABLE `order_status` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
-  `description` int NOT NULL,
+  `description` varchar(30) NOT NULL,
   `is_enabled` boolean NOT NULL
 );
 
