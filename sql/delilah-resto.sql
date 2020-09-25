@@ -70,4 +70,4 @@ INSERT INTO `payment_options` (`id`, `description`, `is_enabled`) VALUES (NULL, 
 INSERT INTO `users` 
 (`id`, `full_name`, `username`, `email`, `phone`, `address`, `user_password`, `created_at`, `is_admin`) 
 VALUES 
-(NULL, 'admin user', 'admin', 'admin@delilahresto.com.ar', '54 011 5555 5555', 'Cabildo 500. Buenos Aires, Argentina', 'admin', current_timestamp(), '1'); 
+(NULL, 'admin user', 'admin', 'admin@delilahresto.com.ar', '54 011 5555 5555', 'Cabildo 500. Buenos Aires, Argentina', '$2b$10$1PQiZfD5N3RpK3Sblt9.3e3zL7oL3M7L3qXhdqU6LmZbraep6B6SO', current_timestamp(), '1'); 
