@@ -90,6 +90,29 @@ router.get('/:id', verifyUserToken, async (req, res) => {
 })
 
 // UPDATING A USER BY ID
+router.put('/:id', verifyUserToken, checkNewUserFields, checkEmailField, hashUserPassword, async (req, res) => {
+    try {
+        console.log("paso")
+        const hashedPassword = res.locals.hashedPassword
+        const { full_name, username, email, phone, address } = req.body
+        const id = parseInt(req.params.id)
+        const userId = parseInt(res.locals.user.id)
+        if (!res.locals.user.is_admin && id !== userId)
+            return res.status(403).send({ error: "User does not have access to the resource" })
+        const data = await sql.query(queries.updateUserById, {
+            replacements: {
+                id, full_name, username, email, phone, address, user_password: hashedPassword
+            }
+        })
+        if (data[0].affectedRows === 1) {
+            res.status(200).json({ message: "User information updated." })
+        } else {
+            res.status(200).send({ message: "No affected rows. User information remains unchanged." })
+        }
+    } catch (err) {
+        res.status(500).json({ message: "Error updating user." })
+    }
+})
 
 // UPDATING A USER BY ID - GIVES ADMIN PERMISSIONS
 router.put('/', verifyUserToken, isUserAdmin, async (req, res) => {
