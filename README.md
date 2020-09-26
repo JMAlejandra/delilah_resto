@@ -85,3 +85,8 @@ In the following images you can see highlighted in yellow the required inputs an
 ![12](https://i.imgur.com/zjXnmFA.png)
 
 The login endpoint does not require an authentication token to be sent with the request, but most endpoints in the API do. For more information, you can see examples in the API [documentation](https://documenter.getpostman.com/view/12197996/TVKFzwCU).
+
+### Other notes
+
+-  If you wish to close the server, close the terminal and that will terminate the service.
+-  In case you wish to add some basic data to the database for testing purposes, there is a file called `delilah-resto-test-data.sql` that you can import into the database once the database structure is created. This is not necessary for the proper functioning of the server, but it provides some data that can be manipulated through the different end points.
