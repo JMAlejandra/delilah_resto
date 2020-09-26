@@ -92,7 +92,6 @@ router.get('/:id', verifyUserToken, async (req, res) => {
 // UPDATING A USER BY ID
 router.put('/:id', verifyUserToken, checkNewUserFields, checkEmailField, hashUserPassword, async (req, res) => {
     try {
-        console.log("paso")
         const hashedPassword = res.locals.hashedPassword
         const { full_name, username, email, phone, address } = req.body
         const id = parseInt(req.params.id)
