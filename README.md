@@ -50,11 +50,15 @@ The following installations steps will be explained using XAAMP and phpmyadmin.
 
 ![7](https://i.imgur.com/4l2Hg8t.png)
 
-8. Once the file has been selected, go to the bottom of the page and click on the ![image](https://i.imgur.com/O5i5VnP.png) button to begin the import process. You should get the following response
+8. Once the file has been selected, go to the bottom right side of the page and click on the ![image](https://i.imgur.com/O5i5VnP.png) button to begin the import process. You should get the following response
 
 ![9](https://i.imgur.com/yMtq7cm.png)
 
-9. After completing the previous steps, you will need to start the node.js server. To do this, open a terminal from inside your project's main folder and run the following code `node server.js`. If successfull, you should get a message stating `Server is up and running`
+9. By default the database creation script creates the table structure in a database named `delilahresto`. If you choose to use a different database or want to add more security and permissions through setting database users, you must modify the `config.json` file in the main folder of the project. In it you can specify the different attributes of the database connection. However, the default values in the file will allow you to create a successful connection to the mysql database.
+
+![13](https://i.imgur.com/Lg9Q3BQ.png)
+
+10. After completing the previous steps, you will need to start the node.js server. To do this, open a terminal from inside your project's main folder and run the following code `node server.js`. If successfull, you should get a message stating `Server is up and running`
 
 ![10](https://i.imgur.com/1LgVre7.png)
 
