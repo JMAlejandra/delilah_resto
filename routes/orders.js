@@ -90,8 +90,8 @@ router.post('/', verifyUserToken, checkNewOrderFields, async (req, res) => {
                 }
             })
         })
-        res.json({ user_id: res.locals.user.id, username: res.locals.user.username, order_id: orderId, order_total: total, order_status: 1, products })
-    } catch (err) { res.status(400).json({ DatabaseError: err }) }
+        res.status(201).json({ user_id: res.locals.user.id, username: res.locals.user.username, order_id: orderId, order_total: total, order_status: 1, products })
+    } catch (err) { res.status(500).json({ Error: err }) }
 })
 
 // UPDATE ORDER STATUS - ADMIN ONLY
@@ -100,7 +100,7 @@ router.put('/:id/?', verifyUserToken, isUserAdmin, async (req, res) => {
         const id_status = parseInt(req.query.id_status)
         const orderId = parseInt(req.params.id)
         const data = await sql.query(queries.updateOrderStatus, { replacements: { id: orderId, id_status } })
-        if (data[0].affectedRows === 0) return res.status(202).json({ Message: "Order not updated, no rows were affected" })
+        if (data[0].affectedRows === 0) return res.status(200).json({ Message: "Order not updated, no rows were affected" })
         res.status(200).json({ message: "Order updated successfully" })
     } catch (err) {
         res.status(500).send(`Server Error: ${err.message}`)

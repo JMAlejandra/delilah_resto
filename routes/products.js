@@ -70,7 +70,7 @@ router.post('/', verifyUserToken, isUserAdmin, checkNewProductFields, async (req
             }
         })
         if (data[1] === 0) return res.status(404).json({ error: "Product not created" })
-        res.status(200).json({ message: "New product created successfully", id_product: data[0] })
+        res.status(201).json({ id_product: data[0], message: "New product created successfully" })
     } catch (err) {
         res.status(500).send(`Database Error: ${err.message}`)
     }
@@ -89,7 +89,7 @@ router.put('/:id', verifyUserToken, isUserAdmin, checkNewProductFields, async (r
                 is_enabled: parseInt(is_enabled)
             }
         })
-        if (data[0].affectedRows === 0) return res.status(404).json({ Message: "Product not updated, no rows were affected" })
+        if (data[0].affectedRows === 0) return res.status(200).json({ Message: "No affected rows. Product information remains unchanged" })
         res.status(200).json({ message: "Product updated successfully" })
     } catch (err) {
         res.status(500).send(`Database Error: ${err.message}`)
